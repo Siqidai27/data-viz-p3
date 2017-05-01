@@ -4,3 +4,5 @@ The git repository is for INFO 5100 - Visual Data Analytics for the Web.
 
 * Group members:
 Chen Pan, Siqi Dai, Yuan He, Zhishui Zheng
+
+chen test
