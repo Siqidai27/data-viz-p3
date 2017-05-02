@@ -81,13 +81,8 @@
 	    <div class="titleFont"></div>
 		<div class="secondaryFont"></div>
 	</div>
-<canvas width="960" height="600"></cavnas>
+<canvas width="1000" height="1000"></cavnas>
 <script>
-    // var width = 800, height = 600, padding = 20;
-    //
-    // var svg = d3.select("#plot").append("svg")
-    //     .attr("width", width + 2 * padding)
-    //     .attr("height", height + 2 * padding);
 
     var canvas = d3.select("canvas"),
         width = canvas.property("width"),
@@ -103,6 +98,8 @@
         .projection(projection)
         .context(context);
 
+    var graticule = d3.geoGraticule();
+
     canvas.call(d3.drag()
         .on("start", dragstarted)
         .on("drag", dragged));
@@ -113,34 +110,68 @@
         q0; // Projection rotation as versor at start.
 
     function dragstarted() {
-      v0 = versor.cartesian(projection.invert(d3.mouse(this)));
-      r0 = projection.rotate();
-      q0 = versor(r0);
+        v0 = versor.cartesian(projection.invert(d3.mouse(this)));
+        r0 = projection.rotate();
+        q0 = versor(r0);
     }
 
     function dragged() {
-      var v1 = versor.cartesian(projection.rotate(r0).invert(d3.mouse(this))),
-          q1 = versor.multiply(q0, versor.delta(v0, v1)),
-          r1 = versor.rotation(q1);
-      projection.rotate(r1);
-      render();
+        var v1 = versor.cartesian(projection.rotate(r0).invert(d3.mouse(this))),
+            q1 = versor.multiply(q0, versor.delta(v0, v1)),
+            r1 = versor.rotation(q1);
+        projection.rotate(r1);
+        render();
     }
 
-    d3.json("https://unpkg.com/world-atlas@1/world/110m.json", function(error, world) {
-      if (error) throw error;
+    d3.queue()
+    .defer(d3.json, "data/world.json")
+    .defer(d3.csv, "data/globalterrorism.csv")
+    .await(function(error, world, terrorism) {
+        if (error) throw error;
 
-      var sphere = {type: "Sphere"},
-          land = topojson.feature(world, world.objects.land);
+        var sphere = {type: "Sphere"},
+            land = topojson.feature(world, world.objects.land),
+            countries = topojson.feature(world, world.objects.countries),
+            grid = graticule();
 
-      render = function() {
-        context.clearRect(0, 0, width, height);
-        context.beginPath(), path(sphere), context.fillStyle = "#fff", context.fill();
-        context.beginPath(), path(land), context.fillStyle = "#000", context.fill();
-        context.beginPath(), path(sphere), context.stroke();
-      };
+        render = function() {
+            context.clearRect(0, 0, width, height);
 
-      render();
+            context.beginPath(),
+            path(sphere);
+            context.lineWidth = 3;
+            context.strokeStyle = "#000";
+            context.stroke();
+            context.fillStyle = "#fff";
+            context.fill();
+            // back
+            projection.clipAngle(180);
+
+            context.beginPath(),
+            path(countries),
+            context.fillStyle = "#dadac4";
+            context.fill();
+
+            context.beginPath();
+            path(grid);
+            context.lineWidth = .5;
+            context.strokeStyle = "rgba(119,119,119,.5)";
+            context.stroke();
+            // front
+            projection.clipAngle(90);
+
+            context.beginPath();
+            path(countries);
+            context.fillStyle = "#737368";
+            context.fill();
+            context.lineWidth = .5;
+            context.strokeStyle = "white";
+            context.stroke();
+        };
+
+        render();
     });
+
 </script>
 
 </body>
