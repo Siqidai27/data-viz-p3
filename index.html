@@ -1,26 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Global Terrorism</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>Global Terrorism</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://d3js.org/d3.v4.min.js"></script>
-	<script src="http://d3js.org/topojson.v2.min.js"></script>
+	<!-- <script src="http://d3js.org/topojson.v2.min.js"></script> -->
 	<script src="scripts/d3-tip.js"></script>
+    <script src="https://unpkg.com/topojson-client@2"></script>
+    <script src="scripts/versor.js"></script>
 </head>
 <style>
+    .d3-tip {
+        line-height: 1;
+        padding: 6px;
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    /* Creates a small triangle extender for the tooltip */
+    .d3-tip:after {
+        box-sizing: border-box;
+        display: inline;
+        font-size: 10px;
+        width: 100%;
+        line-height: 1;
+        color: rgba(0, 0, 0, 0.8);
+        content: "\25BC";
+        position: absolute;
+        text-align: center;
+    }
+
+    /* Style northward tooltips specifically */
+    .d3-tip.n:after {
+        margin: -2px 0 0 0;
+        top: 100%;
+        left: 0;
+    }
+
+    #background {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        z-index: 0;
+    }
+    .titleFont {
+        position: absolute;
+        top: 420px;
+        /*bottom: 40px;*/
+        right: 20px;
+        font-family: "Georgia";
+        font-size: 80px;
+        color: white;
+    }
+    .secondaryFont{
+        position: absolute;
+        top: 500px;
+        /*bottom: 40px;*/
+        right: 20px;
+        font-family: "Georgia";
+        font-size: 50px;
+        color: white;
+    }
+    .img {
+        width: 100%;
+        height: auto;
+        opacity: 0.9;
+        background-size: cover;
+    }
 </style>
 <body>
 	<div class="background">
-	    <img class="img" src="" >
+	    <img class="img" src="image/terrorism_bg1.jpg" >
 	    <div class="titleFont"></div>
 		<div class="secondaryFont"></div>
 	</div>
-
+<canvas width="960" height="600"></cavnas>
 <script>
+    // var width = 800, height = 600, padding = 20;
+    //
+    // var svg = d3.select("#plot").append("svg")
+    //     .attr("width", width + 2 * padding)
+    //     .attr("height", height + 2 * padding);
+
+    var canvas = d3.select("canvas"),
+        width = canvas.property("width"),
+        height = canvas.property("height"),
+        context = canvas.node().getContext("2d");
+
+    var projection = d3.geoOrthographic()
+        .scale((height - 10) / 2)
+        .translate([width / 2, height / 2])
+        .precision(0.1);
+
+    var path = d3.geoPath()
+        .projection(projection)
+        .context(context);
+
+    canvas.call(d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged));
+
+    var render = function() {},
+        v0, // Mouse position in Cartesian coordinates at start of drag gesture.
+        r0, // Projection rotation as Euler angles at start.
+        q0; // Projection rotation as versor at start.
+
+    function dragstarted() {
+      v0 = versor.cartesian(projection.invert(d3.mouse(this)));
+      r0 = projection.rotate();
+      q0 = versor(r0);
+    }
+
+    function dragged() {
+      var v1 = versor.cartesian(projection.rotate(r0).invert(d3.mouse(this))),
+          q1 = versor.multiply(q0, versor.delta(v0, v1)),
+          r1 = versor.rotation(q1);
+      projection.rotate(r1);
+      render();
+    }
+
+    d3.json("https://unpkg.com/world-atlas@1/world/110m.json", function(error, world) {
+      if (error) throw error;
+
+      var sphere = {type: "Sphere"},
+          land = topojson.feature(world, world.objects.land);
+
+      render = function() {
+        context.clearRect(0, 0, width, height);
+        context.beginPath(), path(sphere), context.fillStyle = "#fff", context.fill();
+        context.beginPath(), path(land), context.fillStyle = "#000", context.fill();
+        context.beginPath(), path(sphere), context.stroke();
+      };
+
+      render();
+    });
 </script>
 
 </body>
