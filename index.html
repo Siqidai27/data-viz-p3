@@ -75,16 +75,19 @@
         background-size: cover;
     }
 
-    path {
-        stroke: steelblue;
-        stroke-width: 2;
-        fill: none;
+    .countryTooltip {
+        position: absolute;
+        display: none;
+        pointer-events: none;
+        background: #fff;
+        padding: 5px;
+        text-align: left;
+        border: solid #ccc 1px;
+        color: #666;
+        font-size: 14px;
+        font-family: sans-serif;
     }
-    .land {
-      fill: #3A506B;
-      stroke: #527299;
-      stroke-width: 0.55px;
-    }
+
 </style>
 <body>
 	<div class="background">
@@ -93,7 +96,10 @@
 		<div class="secondaryFont"></div>
 	</div>
 <script>
-    var width = 1000, height = 1000;
+    var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip"),
+    countryList = d3.select("body").append("select").attr("name", "countries");
+
+    var width = 1000, height = 1000, focused;
 
     var svg = d3.select("body").append("svg")
     .attr("width", width)
@@ -108,9 +114,9 @@
 
     var graticule = d3.geoGraticule();
 
-
-    // svg.call(d3.zoom().scaleExtent([1/2, 16]).on("zoom", zoomed));
-	// function zoomed() { g.attr("transform", d3.event.transform); }
+    // svg.call(d3.zoom().scaleExtent([1/2, 16]).on("zoom", function() {
+    //     g.attr("transform", d3.event.transform);
+    // }));
 
     svg.call(d3.drag().on("start", dragstarted).on("drag", dragged));
 
@@ -134,7 +140,8 @@
     }
 
 	var g = svg.append("g");
-    var countries;
+    // var countries;
+
 
     d3.queue()
     .defer(d3.json, "data/world-110m.json")
@@ -145,10 +152,20 @@
         var countries = topojson.feature(world, world.objects.countries).features;
         var grid = graticule();
 
+        var countryById = {};
+
+        countryNames.forEach(function(d) {
+          countryById[d.id] = d.name;
+          option = countryList.append("option");
+          option.text(d.name);
+          option.property("value", d.id);
+        });
+
         render = function() {
             svg.selectAll("path").remove();
 
             projection.clipAngle(180);
+
             var worldBack = g.selectAll("path.back")
             .data(countries)
             .enter().append("path")
@@ -157,6 +174,7 @@
             .style("fill", "lightgray")
             .style("stroke", "gray")
             .style("stroke-width", "1px");
+
             var gridBack = g.selectAll("path.gridback")
             .data([grid])
             .enter()
@@ -168,6 +186,7 @@
             .style("stroke-width", "1px");
 
             projection.clipAngle(90);
+
             var worldFore = g.selectAll("path.front")
             .data(countries)
             .enter()
@@ -187,11 +206,38 @@
             .style("fill", "none")
             .style("stroke", "darkgreen")
             .style("stroke-width", "1px");
+
         };
 
         render();
 
+        d3.select("select").on("change", function() {
+            var rotate = projection.rotate(),
+            focusedCountry = country(countries, this);
+            var p = d3.geoCentroid(focusedCountry);
+            svg.selectAll(".focused").classed("focused", focused = false);
 
+            (function transition() {
+                d3.transition()
+                .duration(2500)
+                .tween("rotate", function() {
+                    var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
+                    return function(t) {
+                        projection.rotate(r(t));
+                        render();
+                        // svg.selectAll("path").attr("d", path)
+                        // .classed("focused", function(d, i) {
+                        //     // console.log(d)
+                        //     return d.id == focusedCountry.id ? focused = d : false; });
+                    };
+                });
+            })();
+        });
+        function country(cnt, sel) {
+            for(var i = 0, l = cnt.length; i < l; i++) {
+                if(cnt[i].id == sel.value) {return cnt[i];}
+            }
+        };
     });
 
 
