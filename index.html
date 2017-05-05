@@ -74,6 +74,18 @@
         opacity: 0.9;
         background-size: cover;
     }
+    .focused {
+      fill: #87BCDE;
+    }
+    select {
+      position: absolute;
+      top: 900px;
+      left: 60px;
+      border: solid #ccc 1px;
+      padding: 3px;
+      box-shadow: inset 1px 1px 2px #ddd8dc;
+      width: 200px;
+    }
 
     .countryTooltip {
         position: absolute;
@@ -235,7 +247,11 @@
         });
         function country(cnt, sel) {
             for(var i = 0, l = cnt.length; i < l; i++) {
-                if(cnt[i].id == sel.value) {return cnt[i];}
+                console.log(cnt[i])
+                console.log(sel.value)
+                if(cnt[i].id == sel.value) {
+                    console.log(sel.value)
+                    return cnt[i];}
             }
         };
     });
