@@ -76,13 +76,13 @@
     }
 
     select {
-      position: absolute;
-      top: 900px;
-      left: 60px;
-      border: solid #ccc 1px;
-      padding: 3px;
-      box-shadow: inset 1px 1px 2px #ddd8dc;
-      width: 200px;
+        position: absolute;
+        top: 50px;
+        left: 60px;
+        border: solid #ccc 1px;
+        padding: 3px;
+        box-shadow: inset 1px 1px 2px #ddd8dc;
+        width: 200px;
     }
 
     .countryTooltip {
@@ -124,15 +124,16 @@
 
 </style>
 <body>
-	<div class="background">
+	<!-- <div class="background">
 	    <img class="img" src="image/terrorism_bg1.jpg" >
 	    <div class="titleFont"></div>
 		<div class="secondaryFont"></div>
-	</div>
+	</div> -->
 <script>
 // SELECT COUNTRY
     var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip"),
     countryList = d3.select("body").append("select").attr("name", "countries");
+
 // create svg for globe
     var width = 1000, height = 1000, focused, countries;
     var svg = d3.select("body").append("svg")
@@ -151,26 +152,22 @@
 
     var render = function() {
         svg.selectAll("path").remove();
-
+        // draw back of the globe
         projection.clipAngle(180);
-
         var worldBack = g.selectAll("path.back")
         .data(countries).enter().append("path")
         .attr("class", "back")
         .attr("d", path);
-
         var gridBack = g.selectAll("path.gridback")
         .data([grid]).enter().append("path")
         .attr("class", "gridback")
         .attr("d", path);
-
+        // draw front of the globe
         projection.clipAngle(90);
-
         var worldFore = g.selectAll("path.front")
         .data(countries).enter().append("path")
         .attr("class", "front")
         .attr("d", path);
-
         var gridFore = g.selectAll("path.gridfront")
         .data([grid]).enter().append("path")
         .attr("class", "gridfront")
@@ -224,7 +221,7 @@
     d3.queue()
     .defer(d3.json, "data/world-110m.json")
     .defer(d3.tsv, "data/world-110m-country-names.tsv")
-    .defer(d3.csv, "data/globalterrorism.csv")
+    .defer(d3.csv, "data/globalterrorism_v1.csv")
     .await(function(error, world, countryNames, terrorism) {
         if (error) throw error;
         // world data
