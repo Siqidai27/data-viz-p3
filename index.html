@@ -74,9 +74,7 @@
         opacity: 0.9;
         background-size: cover;
     }
-    .focused {
-      fill: #87BCDE;
-    }
+
     select {
       position: absolute;
       top: 900px;
@@ -98,6 +96,30 @@
         color: #666;
         font-size: 14px;
         font-family: sans-serif;
+    }
+
+    .back {
+        fill: lightgray;
+        stroke: gray;
+        stroke-width: 1px;
+    }
+    .gridback {
+        fill: none;
+        stroke: darkgrey;
+        stroke-width: 1px;
+    }
+    .front {
+        fill: pink;
+        stroke: red;
+        stroke-width: 1px;
+    }
+    .gridfront {
+        fill: none;
+        stroke: darkgreen;
+        stroke-width: 1px;
+    }
+    .focused {
+        fill: #87BCDE;
     }
 
 </style>
@@ -183,20 +205,14 @@
             .data(countries)
             .enter().append("path")
             .attr("class", "back")
-            .attr("d", path)
-            .style("fill", "lightgray")
-            .style("stroke", "gray")
-            .style("stroke-width", "1px");
+            .attr("d", path);
 
             var gridBack = g.selectAll("path.gridback")
             .data([grid])
             .enter()
             .append("path")
             .attr("class", "gridback")
-            .attr("d", path)
-            .style("fill", "none")
-            .style("stroke", "darkgrey")
-            .style("stroke-width", "1px");
+            .attr("d", path);
 
             projection.clipAngle(90);
 
@@ -205,21 +221,14 @@
             .enter()
             .append("path")
             .attr("class", "front")
-            .attr("d", path)
-            .style("fill", "pink")
-            .style("stroke", "red")
-            .style("stroke-width", "1px");
+            .attr("d", path);
 
             var gridFore = g.selectAll("path.gridfront")
             .data([grid])
             .enter()
             .append("path")
             .attr("class", "gridfront")
-            .attr("d", path)
-            .style("fill", "none")
-            .style("stroke", "darkgreen")
-            .style("stroke-width", "1px");
-
+            .attr("d", path);
         };
 
         render();
@@ -238,10 +247,9 @@
                     return function(t) {
                         projection.rotate(r(t));
                         render();
-                        // svg.selectAll("path").attr("d", path)
-                        // .classed("focused", function(d, i) {
-                        //     // console.log(d)
-                        //     return d.id == focusedCountry.id ? focused = d : false; });
+                        svg.selectAll("path").classed("focused", function(d, i) {
+                            return d.id == focusedCountry.id ? focused = d : false;
+                        });
                     };
                 });
             })();
