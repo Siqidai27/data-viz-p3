@@ -154,7 +154,6 @@
 	var g = svg.append("g");
     // var countries;
 
-
     d3.queue()
     .defer(d3.json, "data/world-110m.json")
     .defer(d3.tsv, "data/world-110m-country-names.tsv")
@@ -162,6 +161,7 @@
         if (error) throw error;
 
         var countries = topojson.feature(world, world.objects.countries).features;
+        console.log(countries)
         var grid = graticule();
 
         var countryById = {};
@@ -172,6 +172,7 @@
           option.text(d.name);
           option.property("value", d.id);
         });
+        console.log(countryNames)
 
         render = function() {
             svg.selectAll("path").remove();
@@ -247,10 +248,9 @@
         });
         function country(cnt, sel) {
             for(var i = 0, l = cnt.length; i < l; i++) {
-                console.log(cnt[i])
+                console.log(cnt[i].id)
                 console.log(sel.value)
                 if(cnt[i].id == sel.value) {
-                    console.log(sel.value)
                     return cnt[i];}
             }
         };
