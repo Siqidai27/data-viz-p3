@@ -155,8 +155,7 @@
 
 // create svg for globe
     var width = 1000, height = 1000;
-    var focused, countries,
-    terrorismData=[];
+    var focused, countries, terrorismData=[], focusedCountry;
     var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
@@ -196,6 +195,12 @@
         .data([grid]).enter().append("path")
         .attr("class", "gridfront")
         .attr("d", path);
+
+        svg.selectAll("path").classed("focused", function(d, i) {
+            console.log("focused")
+            return d.id == focusedCountry.id ? focused = d : false;
+        // 选了country以后画点点
+        });
     };
 
 // !!!SHOW TERRORISM LOCATIONS!!!
@@ -229,10 +234,9 @@
 // !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
     d3.select("select").on("change", function() {
         var rotate = projection.rotate();
-        var focusedCountry;
         for(var i = 0; i < countries.length; i++) {
             if(countries[i].id == this.value) {focusedCountry = countries[i];}
-        }
+        };
         var p = d3.geoCentroid(focusedCountry);
         svg.selectAll(".focused").classed("focused", focused = false);
         (function transition() {
@@ -243,10 +247,10 @@
                 return function(t) {
                     projection.rotate(r(t));
                     render();
-                    svg.selectAll("path").classed("focused", function(d, i) {
-                        return d.id == focusedCountry.id ? focused = d : false;
-                    // 选了country以后画点点
-                    });
+                    // svg.selectAll("path").classed("focused", function(d, i) {
+                    //     return d.id == focusedCountry.id ? focused = d : false;
+                    // // 选了country以后画点点
+                    // });
                 };
             });
         })();
