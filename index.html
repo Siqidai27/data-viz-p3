@@ -12,6 +12,7 @@
 	<script src="scripts/d3-tip.js"></script>
     <script src="https://unpkg.com/topojson-client@2"></script>
     <script src="scripts/versor.js"></script>
+    <script src="scripts/d3.slider.js"></script>
 </head>
 <style>
     .d3-tip {
@@ -75,6 +76,13 @@
         background-size: cover;
     }
 
+    #selectYear {
+         position: absolute;
+         left: 60px;
+         top: 0px;
+         font-family: "arial"
+    }
+
     select {
         position: absolute;
         top: 50px;
@@ -129,16 +137,30 @@
 	    <div class="titleFont"></div>
 		<div class="secondaryFont"></div>
 	</div> -->
+    <div id="selectYear">
+        <label for="year"
+            style="display: inline-block; text-align: left; width: 200px; height: 0px; color: black">
+            year: <span id="year-value"></span>
+        </label>
+        <input id="year" type="range" min="1970" max="2015" step="1">
+    </div>
+    <!-- <div id="yearslider"></div> -->
 <script>
+    var selectYear = d3.select("body").append("div").attr("class", "yearSlider");
+
 // SELECT COUNTRY
     var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip"),
     countryList = d3.select("body").append("select").attr("name", "countries");
+    // d3.select('#yearslider').call(d3.slider().axis(true).min(1970).max(2015).step(1));
 
 // create svg for globe
-    var width = 1000, height = 1000, focused, countries;
+    var width = 1000, height = 1000;
+    var focused, countries,
+    terrorismData=[];
     var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
+
 
 // !!!DRAW GLOBE!!!
     var projection = d3.geoOrthographic()
@@ -152,6 +174,7 @@
 
     var render = function() {
         svg.selectAll("path").remove();
+        svg.selectAll("circle").remove();
         // draw back of the globe
         projection.clipAngle(180);
         var worldBack = g.selectAll("path.back")
@@ -162,17 +185,28 @@
         .data([grid]).enter().append("path")
         .attr("class", "gridback")
         .attr("d", path);
+
         // draw front of the globe
         projection.clipAngle(90);
-        var worldFore = g.selectAll("path.front")
+        var worldFront = g.selectAll("path.front")
         .data(countries).enter().append("path")
         .attr("class", "front")
         .attr("d", path);
-        var gridFore = g.selectAll("path.gridfront")
+        var gridFront = g.selectAll("path.gridfront")
         .data([grid]).enter().append("path")
         .attr("class", "gridfront")
         .attr("d", path);
     };
+
+// !!!SHOW TERRORISM LOCATIONS!!!
+    function showLocation(terrorismLocation) {
+        var terrorism = g.selectAll("circle")
+        .data(terrorismLocation).enter().append("circle")
+        .attr("cx", function(d) {return projection(d.location)[0];})
+        .attr("cy", function(d) {return projection(d.location)[1];})
+        .attr("r", 1)
+        .style("fill", "red");
+    }
 
 // !!!DRAG GLOBE FUNCTION!!!
     svg.call(d3.drag().on("start", dragstarted).on("drag", dragged));
@@ -211,18 +245,29 @@
                     render();
                     svg.selectAll("path").classed("focused", function(d, i) {
                         return d.id == focusedCountry.id ? focused = d : false;
+                    // 选了country以后画点点
                     });
                 };
             });
         })();
     });
 
+// ->SELECT YEAR!!!
+    d3.select("#year").on("input", function(){
+        d3.selectAll("circle").remove();
+        d3.select("#year-value").text(this.value);
+// 选了year后画点点
+
+    })
+
+
+
 // !!!LOAD DATA!!!
     d3.queue()
     .defer(d3.json, "data/world-110m.json")
     .defer(d3.tsv, "data/world-110m-country-names.tsv")
-    .defer(d3.csv, "data/globalterrorism_v1.csv")
-    .await(function(error, world, countryNames, terrorism) {
+    .defer(d3.csv, "data/globalterrorism_v2.csv")
+    .await(function(error, world, countryNames, rawTerrorism) {
         if (error) throw error;
         // world data
         countries = topojson.feature(world, world.objects.countries).features;
@@ -234,6 +279,20 @@
             option.text(d.name);
             option.property("value", d.id);
         });
+        var terrorism = rawTerrorism;
+        // console.log(terrorism)
+        terrorism.forEach(function(d){
+            if (d.iyear >= 2015 ) {
+                terrorismData.push({"location":[d.longitude,d.latitude]})
+            }
+        })
+        var nestedTerrorism = d3.nest()
+        // .key(function(d){ return d.iyear; })
+        .key(function(d){ return d.country; })
+        .entries(terrorism)
+        console.log(nestedTerrorism)
+
+
         // call render function to draw globe
         render();
     });
