@@ -171,7 +171,7 @@
     var grid = graticule();
     var g = svg.append("g");
 
-    var render = function() {
+    function showGlobe(){
         svg.selectAll("path").remove();
         svg.selectAll("circle").remove();
         // draw back of the globe
@@ -196,10 +196,10 @@
         .attr("class", "gridfront")
         .attr("d", path);
 
+        // highlight focusedCountry
         svg.selectAll("path").classed("focused", function(d, i) {
             console.log("focused")
             return d.id == focusedCountry.id ? focused = d : false;
-        // 选了country以后画点点
         });
     };
 
@@ -228,7 +228,7 @@
             q1 = versor.multiply(q0, versor.delta(v0, v1)),
             r1 = versor.rotation(q1);
         projection.rotate(r1);
-        render();
+        showGlobe();
     }
 
 // !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
@@ -246,7 +246,7 @@
                 var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
                 return function(t) {
                     projection.rotate(r(t));
-                    render();
+                    showGlobe();
                 };
             });
         })();
@@ -294,7 +294,7 @@
 
 
         // call render function to draw globe
-        render();
+        showGlobe();
     });
 
 
