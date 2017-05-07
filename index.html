@@ -266,7 +266,7 @@
     d3.queue()
     .defer(d3.json, "data/world-110m.json")
     .defer(d3.tsv, "data/world-110m-country-names.tsv")
-    .defer(d3.csv, "data/globalterrorism_v2.csv")
+    .defer(d3.csv, "data/globalterrorism_new.csv")
     .await(function(error, world, countryNames, rawTerrorism) {
         if (error) throw error;
         // world data
@@ -281,14 +281,14 @@
         });
         var terrorism = rawTerrorism;
         // console.log(terrorism)
-        terrorism.forEach(function(d){
-            if (d.iyear >= 2015 ) {
-                terrorismData.push({"location":[d.longitude,d.latitude]})
-            }
+        terrorism.forEach(function(d,i){
+            terrorism[i]["location"]=[d.longitude,d.latitude];
+            // console.log(terrorism[i])ß
         })
         var nestedTerrorism = d3.nest()
-        // .key(function(d){ return d.iyear; })
         .key(function(d){ return d.country; })
+        .key(function(d){ return d.iyear; })
+        .rollup(function(v){ return v;})
         .entries(terrorism)
         console.log(nestedTerrorism)
 
