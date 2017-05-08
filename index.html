@@ -206,9 +206,9 @@
     }
 
 // !!!SHOW TERRORISM LOCATIONS!!!
-    function showLocation(terrorisms) {
+    function showLocation() {
         svg.selectAll("circle").remove();
-        terrorisms.forEach(function(d){
+        allData[focusedCountry.id].forEach(function(d){
             d[yearSelected].forEach(function(e){
                 g.append("circle")
                 .attr("cx", projection(e.location)[0])
@@ -236,7 +236,7 @@
         projection.rotate(r1);
         showGlobe();
         highlightCountry();
-        if (focusedCountry) {showLocation(allData[focusedCountry.id]);}
+        if (focusedCountry) {showLocation();}
     }
 
 // !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
@@ -256,7 +256,7 @@
                     projection.rotate(r(t));
                     showGlobe();
                     highlightCountry();
-                    showLocation(allData[focusedCountry.id]);
+                    showLocation();
                 };
             });
         })();
@@ -268,7 +268,7 @@
         yearSelected = this.value;
         d3.selectAll("circle").remove();
         d3.select("#year-value").text(yearSelected);
-        if (focusedCountry) {showLocation(allData[focusedCountry.id]);}
+        if (focusedCountry) {showLocation();}
 
 // 选了year后画点点
 
