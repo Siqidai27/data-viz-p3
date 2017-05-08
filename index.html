@@ -184,23 +184,31 @@
 
         // draw back of the globe
         projection.clipAngle(180);
+
         var worldBack = g.selectAll("path.back")
-        .data(countries).enter().append("path")
+        .data(countries)
+        .enter().append("path")
         .attr("class", "back")
         .attr("d", path);
+
         var gridBack = g.selectAll("path.gridback")
-        .data([grid]).enter().append("path")
+        .data([grid])
+        .enter().append("path")
         .attr("class", "gridback")
         .attr("d", path);
 
         // draw front of the globe
         projection.clipAngle(90);
+
         var worldFront = g.selectAll("path.front")
-        .data(countries).enter().append("path")
+        .data(countries)
+        .enter().append("path")
         .attr("class", "front")
         .attr("d", path);
+
         var gridFront = g.selectAll("path.gridfront")
-        .data([grid]).enter().append("path")
+        .data([grid])
+        .enter().append("path")
         .attr("class", "gridfront")
         .attr("d", path);
     };
@@ -217,15 +225,34 @@
 // !!!SHOW TERRORISM LOCATIONS!!!
     function showLocation() {
         svg.selectAll("circle").remove();
-        allData[focusedCountry.id].forEach( function(d) {
-            d[yearSelected].forEach( function(e) {
-                g.append("circle")
-                .attr("cx", projection(e.location)[0])
-                .attr("cy", projection(e.location)[1])
-                .attr("r", 5)
-                .style("fill", "red");
+
+        var tool_tip = d3.tip()
+			.attr("class", "d3-tip")
+			.offset([-8, 0])
+			.html(function(d,i) {
+            // console.log(d)
+			    return "Date: " + d.iyear + "-" + d.imonth + "-" + d.iday
+                + "<br> Location: " + d.city + ", " + d.provstate + ", " +d.country_txt
+                + "<br> Attack Type: " + d.attacktype1_txt
+                + "<br> Target: " + d.targtype1_txt
+                + "<br> # Killed: " + d.nkill + " # Wounded: " + d.nwound
+                // + "<br> Short Summary: " + d.summary;
+                // summary 太长了 想想有没有办法限制宽度
             });
-        });
+
+		svg.call(tool_tip);
+
+        var circles = g.selectAll("circle")
+        .data(allData[focusedCountry.id][0][yearSelected])
+        .enter().append("circle")
+        .attr("cx", function(d) {return projection([d.longitude, d.latitude])[0];})
+        .attr("cy", function(d) {return projection([d.longitude, d.latitude])[1];})
+        .attr("r", 5)
+        .style("fill", "red")
+        .on("mouseover", tool_tip.show)
+        .on("mouseout", tool_tip.hide);
+
+
     };
 
 
@@ -316,10 +343,6 @@
         var terrorism = rawTerrorism;
 
         var tempData=[]
-
-        terrorism.forEach(function(d,i){
-            terrorism[i]["location"]=[d.longitude,d.latitude];
-        })
 
         terrorism.forEach(function(d){
           var value = d;
