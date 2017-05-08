@@ -171,7 +171,7 @@
     var grid = graticule();
     var g = svg.append("g");
 
-    var render = function() {
+    function showGlobe(){
         svg.selectAll("path").remove();
         svg.selectAll("circle").remove();
         // draw back of the globe
@@ -195,13 +195,14 @@
         .data([grid]).enter().append("path")
         .attr("class", "gridfront")
         .attr("d", path);
-
-        svg.selectAll("path").classed("focused", function(d, i) {
-            console.log("focused")
-            return d.id == focusedCountry.id ? focused = d : false;
-        // 选了country以后画点点
-        });
     };
+
+// highlight focusedCountry
+    function highlightCountry() {
+        svg.selectAll("path").classed("focused", function(d, i) {
+            return d.id == focusedCountry.id ? focused = d : false;
+        });
+    }
 
 // !!!SHOW TERRORISM LOCATIONS!!!
     function showLocation(terrorismLocation) {
@@ -228,13 +229,14 @@
             q1 = versor.multiply(q0, versor.delta(v0, v1)),
             r1 = versor.rotation(q1);
         projection.rotate(r1);
-        render();
+        showGlobe();
+        highlightCountry();
     }
 
 // !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
     d3.select("select").on("change", function() {
         var rotate = projection.rotate();
-        for(var i = 0; i < countries.length; i++) {
+        for (var i = 0; i < countries.length; i++) {
             if(countries[i].id == this.value) {focusedCountry = countries[i];}
         };
         var p = d3.geoCentroid(focusedCountry);
@@ -246,7 +248,10 @@
                 var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
                 return function(t) {
                     projection.rotate(r(t));
-                    render();
+                    showGlobe();
+                    highlightCountry();
+
+                    showLocation();
                 };
             });
         })();
@@ -318,11 +323,16 @@
         .key(function(d){ return d.iyear; })
         .rollup(function(v){ return v;})
         .entries(terrorism)
-        // console.log(nestedTerrorism)
 
+
+        nestedTerrorism.forEach(function(d){
+            if (d.key == 44) {
+                console.log(d)
+            }
+        })
 
         // call render function to draw globe
-        render();
+        showGlobe();
     });
 
 
