@@ -260,13 +260,22 @@
 
     })
 
+    var countryKey = []
+    var allData = []
+    // var yearData=[];
+    function parseAllData(line){
+      countryKey[line.Country_ID]=[];
+      allData[line.Country_ID]=[];
+      return line;
+    }
+
 
 
 // !!!LOAD DATA!!!
     d3.queue()
     .defer(d3.json, "data/world-110m.json")
     .defer(d3.tsv, "data/world-110m-country-names.tsv")
-    .defer(d3.csv, "data/globalterrorism_new.csv")
+    .defer(d3.csv, "data/globalterrorism_new.csv",parseAllData)
     .await(function(error, world, countryNames, rawTerrorism) {
         if (error) throw error;
         // world data
@@ -280,17 +289,36 @@
             option.property("value", d.id);
         });
         var terrorism = rawTerrorism;
-        // console.log(terrorism)
+        var tempData=[]
         terrorism.forEach(function(d,i){
             terrorism[i]["location"]=[d.longitude,d.latitude];
             // console.log(terrorism[i])ß
         })
+        terrorism.forEach(function(d){
+          var value = d;
+          countryKey[d.Country_ID].push(value);
+        })
+        var yearData = [];
+        // yearData["unk"]=1;
+        countryKey.forEach(function(d,i){
+          yearData = [];
+          for(var j=0;j<d.length;j++){
+            yearData[d[j].iyear]=[];
+          }
+          d.forEach(function(v){
+            var value = v;
+            yearData[v.iyear].push(value);
+          })
+          allData[i].push(yearData);
+        })
+
+        // console.log(allData)
         var nestedTerrorism = d3.nest()
         .key(function(d){ return d.country; })
         .key(function(d){ return d.iyear; })
         .rollup(function(v){ return v;})
         .entries(terrorism)
-        console.log(nestedTerrorism)
+        // console.log(nestedTerrorism)
 
 
         // call render function to draw globe
