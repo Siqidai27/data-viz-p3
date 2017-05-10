@@ -162,10 +162,13 @@
 
 
 // create svg for globe
-    var width = 1000, height = 1000;
+    var width = 900, height = 900;
     var focused, countries, terrorismData=[], focusedCountry, terrorisms;
     var svg = d3.select("body").append("svg")
     .attr("width", width)
+    .attr("height", height);
+    var svg2 = d3.select("body").append("svg")
+    .attr("width", 500)
     .attr("height", height);
 
 
@@ -251,9 +254,20 @@
         .style("fill", "red")
         .on("mouseover", tool_tip.show)
         .on("mouseout", tool_tip.hide);
-
-
     };
+
+// !!!SHOW SUMMARY!!!
+    function showSummary() {
+        // console.log(allData[focusedCountry.id][0][yearSelected])
+        var total_nkill = 0;
+        var total_nwound = 0;
+        allData[focusedCountry.id][0][yearSelected].forEach(function(d){
+            // console.log(Number(d.nkill))
+            total_nkill += Number(d.nkill);
+            total_nwound += Number(d.nwound);
+        })
+        console.log(total_nkill)
+    }
 
 
 // !!!DRAG GLOBE FUNCTION!!!
@@ -276,7 +290,7 @@
         projection.rotate(r1);
         showGlobe();
         highlightCountry();
-        if (focusedCountry) {showLocation();}
+        if (allData[focusedCountry.id][0][yearSelected]) {showLocation();}
     };
 
 
@@ -301,7 +315,10 @@
                     projection.rotate(r(t));
                     showGlobe();
                     highlightCountry();
-                    showLocation();
+                    if (allData[focusedCountry.id][0][yearSelected]) {
+                        showLocation();
+                        showSummary();
+                    }
                 };
             });
         })();
