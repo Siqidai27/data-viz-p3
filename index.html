@@ -16,7 +16,8 @@
 </head>
 <style>
     .d3-tip {
-        line-height: 1;
+        line-height: 1.5;
+        max-width: 400px;
         padding: 6px;
         background: rgba(0, 0, 0, 0.8);
         color: #fff;
@@ -150,14 +151,53 @@
     countryList = d3.select("body").append("select").attr("name", "countries");
 
 
+// !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
+    d3.select("select").on("change", function() {
+        var rotate = projection.rotate();
+
+        for (var i = 0; i < countries.length; i++) {
+            if(countries[i].id == this.value) {focusedCountry = countries[i];}
+        };
+
+        var p = d3.geoCentroid(focusedCountry);
+
+        svg.selectAll(".focused").classed("focused", focused = false);
+
+        (function transition() {
+            d3.transition()
+            .duration(2500)
+            .tween("rotate", function() {
+                var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
+                return function(t) {
+                    projection.rotate(r(t));
+                    showGlobe();
+                    highlightCountry();
+                    if (allData[focusedCountry.id]) {
+                        showLocation();
+
+                    }
+                    else { svg.selectAll("circle").remove(); console.log("circle removed")};
+                    showSummary();
+                };
+            });
+        })();
+        // circles.on("mouseover", tool_tip.show).on("mouseout", tool_tip.hide);
+    });
+
+
 // SELECT YEAR
     var yearSelected=2015;
     d3.select("#year-value").text(yearSelected);
     d3.select("#year").on("input", function(){
-        yearSelected = this.value;
         d3.selectAll("circle").remove();
+
+        yearSelected = this.value;
         d3.select("#year-value").text(yearSelected);
-        if (focusedCountry) {showLocation();}
+
+        if (allData[focusedCountry.id]) {
+            showLocation();
+            showSummary();
+        }
     })
 
 
@@ -181,6 +221,7 @@
     var graticule = d3.geoGraticule();
     var grid = graticule();
     var g = svg.append("g");
+    var circles;
 
     function showGlobe() {
         svg.selectAll("path").remove();
@@ -224,53 +265,67 @@
         });
     };
 
+    var tool_tip = d3.tip()
+        .attr("class", "d3-tip")
+        .offset([-8, 0])
+        .html(function(d,i) {
+        // console.log(d)
+            return "Date: " + d.iyear + "-" + d.imonth + "-" + d.iday
+            + "<br> Location: " + d.city + ", " + d.provstate + ", " +d.country_txt
+            + "<br> Attack Type: " + d.attacktype1_txt
+            + "<br> Target: " + d.targtype1_txt
+            + "<br> # Killed: " + d.nkill + " # Wounded: " + d.nwound
+            + "<br> Short Summary: " + d.summary;
+            // summary 太长了 想想有没有办法限制宽度
+        });
+
 
 // !!!SHOW TERRORISM LOCATIONS!!!
     function showLocation() {
         svg.selectAll("circle").remove();
 
-        var tool_tip = d3.tip()
-			.attr("class", "d3-tip")
-			.offset([-8, 0])
-			.html(function(d,i) {
-            // console.log(d)
-			    return "Date: " + d.iyear + "-" + d.imonth + "-" + d.iday
-                + "<br> Location: " + d.city + ", " + d.provstate + ", " +d.country_txt
-                + "<br> Attack Type: " + d.attacktype1_txt
-                + "<br> Target: " + d.targtype1_txt
-                + "<br> # Killed: " + d.nkill + " # Wounded: " + d.nwound
-                // + "<br> Short Summary: " + d.summary;
-                // summary 太长了 想想有没有办法限制宽度
-            });
-
 		svg.call(tool_tip);
 
-        var circles = g.selectAll("circle")
-        .data(allData[focusedCountry.id][0][yearSelected])
-        .enter().append("circle")
-        .attr("cx", function(d) {return projection([d.longitude, d.latitude])[0];})
-        .attr("cy", function(d) {return projection([d.longitude, d.latitude])[1];})
-        .attr("r", 5)
-        .style("fill", "red")
-        .on("mouseover", tool_tip.show)
-        .on("mouseout", tool_tip.hide);
+        if (allData[focusedCountry.id]) {
+            if (allData[focusedCountry.id][0][yearSelected]) {
+                circles = g.selectAll("circle")
+                .data(allData[focusedCountry.id][0][yearSelected])
+                .enter().append("circle")
+                .attr("cx", function(d) {return projection([d.longitude, d.latitude])[0];})
+                .attr("cy", function(d) {return projection([d.longitude, d.latitude])[1];})
+                .attr("r", 5)
+                .style("fill", "red")
+                .on("mouseover", tool_tip.show)
+                .on("mouseout", tool_tip.hide);
+            }
+        };
     };
 
 // !!!SHOW SUMMARY!!!
     function showSummary() {
         // console.log(allData[focusedCountry.id][0][yearSelected])
+        svg2.selectAll("text").remove();
+
         var total_nkill = 0;
         var total_nwound = 0;
-        allData[focusedCountry.id][0][yearSelected].forEach(function(d){
-            // console.log(Number(d.nkill))
-            total_nkill += Number(d.nkill);
-            total_nwound += Number(d.nwound);
-        })
-        console.log(total_nkill)
+
+        if (allData[focusedCountry.id]) {
+            if (allData[focusedCountry.id][0][yearSelected]) {
+                allData[focusedCountry.id][0][yearSelected].forEach(function(d){
+                    // console.log(Number(d.nkill))
+                    total_nkill += Number(d.nkill);
+                    total_nwound += Number(d.nwound);
+                });
+            };
+        };
+        // console.log(total_nkill)
+
         svg2.append("text")
-        .text("total # of killed:" + total_nkill)
+        .html(function(){
+            return"Total Number of killed:" + total_nkill
+                + "<br>" + " Total Number of Wounded: " + total_nwound})
         .attr("x", 100)
-        .attr("y", 100)
+        .attr("y", 100);
     }
 
 
@@ -294,39 +349,11 @@
         projection.rotate(r1);
         showGlobe();
         highlightCountry();
-        if (allData[focusedCountry.id][0][yearSelected]) {showLocation();}
+        if (allData[focusedCountry.id]) {showLocation();}
     };
 
 
-// !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
-    d3.select("select").on("change", function() {
-        var rotate = projection.rotate();
 
-        for (var i = 0; i < countries.length; i++) {
-            if(countries[i].id == this.value) {focusedCountry = countries[i];}
-        };
-
-        var p = d3.geoCentroid(focusedCountry);
-
-        svg.selectAll(".focused").classed("focused", focused = false);
-
-        (function transition() {
-            d3.transition()
-            .duration(2500)
-            .tween("rotate", function() {
-                var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
-                return function(t) {
-                    projection.rotate(r(t));
-                    showGlobe();
-                    highlightCountry();
-                    if (allData[focusedCountry.id][0][yearSelected]) {
-                        showLocation();
-                        showSummary();
-                    }
-                };
-            });
-        })();
-    });
 
 
     var countryKey = []
