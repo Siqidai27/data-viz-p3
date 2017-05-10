@@ -267,6 +267,10 @@
             total_nwound += Number(d.nwound);
         })
         console.log(total_nkill)
+        svg2.append("text")
+        .text("total # of killed:" + total_nkill)
+        .attr("x", 100)
+        .attr("y", 100)
     }
 
 
