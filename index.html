@@ -475,11 +475,14 @@
           allData[i].push(yearData);
         })
 
-        var nestedTerrorism = d3.nest()
-        .key(function(d){ return d.Country_ID; })
-        .key(function(d){ return d.iyear; })
-        .rollup(function(v){ return v;})
-        .entries(terrorism)
+        console.log(countryKey.length)
+        console.log(allData)
+
+        // var nestedTerrorism = d3.nest()
+        // .key(function(d){ return d.Country_ID; })
+        // .key(function(d){ return d.iyear; })
+        // .rollup(function(v){ return v;})
+        // .entries(terrorism)
 
         // call render function to draw globe
         showGlobe();
