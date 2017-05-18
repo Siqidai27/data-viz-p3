@@ -312,7 +312,17 @@
     function showSummary() {
         // console.log(allData[focusedCountry.id][0][yearSelected])
         svg2.selectAll("text").remove();
+        var charts = svg2.append("g")
+            .attr("id", "charts")
+            .append("rect")
+            .attr("width", 300)
+            .attr("height", 800)
+            .attr("x", 0)
+            .attr("y", 0)
+            .style("fill", "white")
+            .style("stroke", "grey");
         // d3.select("#chart1").remove();
+        // svg2.selectAll("g").remove();
 
         var total_nkill = 0;
         var total_nwound = 0;
@@ -354,8 +364,6 @@
         var dataset = [
           { label: 'Abulia', count: total_nwound },
           { label: 'Betelgeuse', count: total_nkill },
-          { label: 'Cantaloupe', count: 30 },
-          { label: 'Dijkstra', count: 40 }
         ];
 
         var width = 200;
@@ -364,30 +372,43 @@
 
         var color = d3.scaleOrdinal(d3.schemeCategory20b);
 
-        var svgChart1 = d3.select("#summary")
-        .attr("id", "chart1")
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .append('g')
-        .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
+        // var svgChart1 = d3.select("#charts")
+        //     .attr("id", "chart1")
+        //     .append('svg')
+        //     .attr('width', width)
+        //     .attr('height', height)
+        //     .append('g')
+        //     .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
+
+        var svgChart2 = d3.select("#charts")
+            .attr("id", "chart2")
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height)
+            .append('g')
+            .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
 
         var arc = d3.arc()
-        .innerRadius(0)
-        .outerRadius(radius);
+            .innerRadius(0)
+            .outerRadius(radius);
 
         var pie = d3.pie()
-        .value(function(d) { return d.count; })
-        .sort(null);
+            .value(function(d) { return d.count; })
+            .sort(null);
 
-        var path = svgChart1.selectAll('path')
-        .data(pie(dataset))
-        .enter()
-        .append('path')
-        .attr('d', arc)
-        .attr('fill', function(d, i) {
-            return color(d.data.label);
-        });
+        // svgChart1.selectAll('path')
+        //     .data(pie(dataset))
+        //     .enter()
+        //     .append('path')
+        //     .attr('d', arc)
+        //     .attr('fill', function(d, i) { return color(d.data.label); });
+
+        svgChart2.selectAll('path')
+            .data(pie(dataset))
+            .enter()
+            .append('path')
+            .attr('d', arc)
+            .attr('fill', function(d, i) { return color(d.data.label); });
     }
 
 
