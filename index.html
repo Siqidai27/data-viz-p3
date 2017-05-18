@@ -183,7 +183,6 @@
                     highlightCountry();
                     if (allData[focusedCountry.id]) {
                         showLocation();
-
                     }
                     else { svg.selectAll("circle").remove(); console.log("circle removed")};
                     showSummary();
@@ -238,13 +237,13 @@
         // draw back of the globe
         projection.clipAngle(180);
 
-        var worldBack = g.selectAll("path.back")
+        var worldBack = svg.selectAll("path.back")
         .data(countries)
         .enter().append("path")
         .attr("class", "back")
         .attr("d", path);
 
-        var gridBack = g.selectAll("path.gridback")
+        var gridBack = svg.selectAll("path.gridback")
         .data([grid])
         .enter().append("path")
         .attr("class", "gridback")
@@ -253,13 +252,13 @@
         // draw front of the globe
         projection.clipAngle(90);
 
-        var worldFront = g.selectAll("path.front")
+        var worldFront = svg.selectAll("path.front")
         .data(countries)
         .enter().append("path")
         .attr("class", "front")
         .attr("d", path);
 
-        var gridFront = g.selectAll("path.gridfront")
+        var gridFront = svg.selectAll("path.gridfront")
         .data([grid])
         .enter().append("path")
         .attr("class", "gridfront")
@@ -270,13 +269,13 @@
 // highlight focusedCountry
     function highlightCountry() {
         svg.selectAll("path").classed("focused", function(d, i) {
-            return d.id == focusedCountry.id ? focused = d : false;
+            if (focusedCountry) { return d.id == focusedCountry.id ? focused = d : false; }
         });
     };
 
     var tool_tip = d3.tip()
         .attr("class", "d3-tip")
-        .offset([-8, 0])
+        .offset([-15, -10])
         .html(function(d,i) {
         // console.log(d)
             return "Date: " + d.iyear + "-" + d.imonth + "-" + d.iday
@@ -297,7 +296,7 @@
 
         if (allData[focusedCountry.id]) {
             if (allData[focusedCountry.id][0][yearSelected]) {
-                circles = g.selectAll("circle")
+                circles = svg.selectAll("circle")
                 .data(allData[focusedCountry.id][0][yearSelected])
                 .enter().append("circle")
                 .attr("cx", function(d) {return projection([d.longitude, d.latitude])[0];})
@@ -413,21 +412,17 @@
         projection.rotate(r1);
         showGlobe();
         highlightCountry();
-        if (allData[focusedCountry.id]) {showLocation();}
+        if (focusedCountry) {showLocation();}
     };
-
-
-
-
 
     var countryKey = []
     var allData = []
     // var yearData=[];
 
     function parseAllData(line){
-      countryKey[line.Country_ID]=[];
-      allData[line.Country_ID]=[];
-      return line;
+        countryKey[line.Country_ID]=[];
+        allData[line.Country_ID]=[];
+        return line;
     }
 
 
@@ -475,8 +470,8 @@
           allData[i].push(yearData);
         })
 
-        console.log(countryKey.length)
-        console.log(allData)
+        // console.log(countryKey.length)
+        // console.log(allData)
 
         // var nestedTerrorism = d3.nest()
         // .key(function(d){ return d.Country_ID; })
