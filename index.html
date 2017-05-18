@@ -312,17 +312,6 @@
     function showSummary() {
         // console.log(allData[focusedCountry.id][0][yearSelected])
         svg2.selectAll("text").remove();
-        var charts = svg2.append("g")
-            .attr("id", "charts")
-            .append("rect")
-            .attr("width", 300)
-            .attr("height", 800)
-            .attr("x", 0)
-            .attr("y", 0)
-            .style("fill", "white")
-            .style("stroke", "grey");
-        // d3.select("#chart1").remove();
-        // svg2.selectAll("g").remove();
 
         var total_nkill = 0;
         var total_nwound = 0;
@@ -366,49 +355,32 @@
           { label: 'Betelgeuse', count: total_nkill },
         ];
 
-        var width = 200;
-        var height = 200;
+        var width = 150;
+        var height = 150;
         var radius = Math.min(width, height) / 2;
+        var donutWidth = 30;
 
         var color = d3.scaleOrdinal(d3.schemeCategory20b);
+        var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
+        var pie = d3.pie().value(function(d) { return d.count; }).sort(null);
 
-        // var svgChart1 = d3.select("#charts")
-        //     .attr("id", "chart1")
-        //     .append('svg')
-        //     .attr('width', width)
-        //     .attr('height', height)
-        //     .append('g')
-        //     .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
+        for (i = 0; i < 3; i++) {
+            var a = 100 + 200 * i;
+            var b = 500 ;
+            var svgChart = d3.select("#summary")
+                .append('svg')
+                .attr('width', 600)
+                .attr('height', 800)
+                .append('g')
+                .attr('transform', 'translate(' + a  +  ',' + b + ')');
 
-        var svgChart2 = d3.select("#charts")
-            .attr("id", "chart2")
-            .append('svg')
-            .attr('width', width)
-            .attr('height', height)
-            .append('g')
-            .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
-
-        var arc = d3.arc()
-            .innerRadius(0)
-            .outerRadius(radius);
-
-        var pie = d3.pie()
-            .value(function(d) { return d.count; })
-            .sort(null);
-
-        // svgChart1.selectAll('path')
-        //     .data(pie(dataset))
-        //     .enter()
-        //     .append('path')
-        //     .attr('d', arc)
-        //     .attr('fill', function(d, i) { return color(d.data.label); });
-
-        svgChart2.selectAll('path')
-            .data(pie(dataset))
-            .enter()
-            .append('path')
-            .attr('d', arc)
-            .attr('fill', function(d, i) { return color(d.data.label); });
+            var path = svgChart.selectAll('path')
+                .data(pie(dataset))
+                .enter()
+                .append('path')
+                .attr('d', arc)
+                .attr('fill', function(d, i) { return color(d.data.label); });
+        }
     }
 
 
@@ -472,22 +444,22 @@
         var tempData=[]
 
         terrorism.forEach(function(d){
-          var value = d;
-          countryKey[d.Country_ID].push(value);
+            var value = d;
+            countryKey[d.Country_ID].push(value);
         })
 
         var yearData = [];
 
         countryKey.forEach(function(d,i){
-          yearData = [];
-          for(var j=0;j<d.length;j++){
-            yearData[d[j].iyear]=[];
-          }
-          d.forEach(function(v){
-            var value = v;
-            yearData[v.iyear].push(value);
-          })
-          allData[i].push(yearData);
+            yearData = [];
+            for(var j=0;j<d.length;j++){
+                yearData[d[j].iyear]=[];
+            }
+            d.forEach(function(v){
+                var value = v;
+                yearData[v.iyear].push(value);
+            })
+            allData[i].push(yearData);
         })
 
         // console.log(countryKey.length)
