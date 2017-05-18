@@ -21,6 +21,10 @@
     }
     rect {
         fill: skyblue;
+        stroke-width: 2;
+    }
+    .legend {
+        font-size: 12px;
     }
 
     .d3-tip {
@@ -156,8 +160,12 @@
     <!-- <div class="container"></div> -->
 <script>
 // SELECT COUNTRY
-    var countryTooltip = d3.select("body").append("div").attr("class", "countryTooltip"),
-    countryList = d3.select("body").append("select").attr("name", "countries");
+    var countryTooltip = d3.select("body")
+    .append("div")
+    .attr("class", "countryTooltip"),
+    countryList = d3.select("body")
+    .append("select")
+    .attr("name", "countries");
 
 
 // !!!GLOBE ROTATION -> FOCUSEDCOUNTRY!!!
@@ -179,12 +187,16 @@
                 var r = d3.interpolate(projection.rotate(), [-p[0], -p[1]]);
                 return function(t) {
                     projection.rotate(r(t));
+
                     showGlobe();
+
                     highlightCountry();
+
                     if (allData[focusedCountry.id]) {
                         showLocation();
                     }
                     else { svg.selectAll("circle").remove(); console.log("circle removed")};
+
                     showSummary();
                 };
             });
@@ -195,15 +207,19 @@
 
 // SELECT YEAR
     var yearSelected=2015;
+
     d3.select("#year-value").text(yearSelected);
+
     d3.select("#year").on("input", function(){
         d3.selectAll("circle").remove();
 
         yearSelected = this.value;
+
         d3.select("#year-value").text(yearSelected);
+
         showGlobe();
 
-        if (allData[focusedCountry.id]) {
+        if (focusedCountry) {
             showLocation();
             showSummary();
         }
@@ -212,11 +228,19 @@
 
 // create svg for globe
     var width = 800, height = 800;
-    var focused, countries, terrorismData=[], focusedCountry, terrorisms;
-    var svg = d3.select("body").append("svg")
+    var focused,
+    countries,
+    terrorismData=[],
+    focusedCountry,
+    terrorisms;
+
+    var svg = d3.select("body")
+    .append("svg")
     .attr("width", width)
     .attr("height", height);
-    var svg2 = d3.select("body").append("svg").attr("id", "summary")
+
+    var svg2 = d3.select("body")
+    .append("svg").attr("id", "summary")
     .attr("width", 600)
     .attr("height", height);
 
@@ -226,12 +250,17 @@
     .scale(350)
     .rotate([0, 0])
     .translate([width / 2 , height / 2 + 30]);
+
     var path = d3.geoPath().projection(projection);
+
     var graticule = d3.geoGraticule();
+
     var grid = graticule();
+
     var circles;
 
     var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
+
     var percentScale = d3.scaleLinear()
     .domain([0, 10, 100, 1000, 2000]).range(sequentialColors);
 
@@ -261,19 +290,20 @@
         .enter().append("path")
         .attr("class", "front")
         .style("fill", function(d){
-          if(typeof allData[d.id] == "undefined"){ return "green";}  //color for undefined id
-          else{
-            var attackTimes;
-            if(typeof allData[d.id][0][yearSelected] == "undefined"){
-              attackTimes = 0;
-            }
+            if( typeof allData[d.id] == "undefined"){ return "green";}  //color for undefined id
             else{
-              attackTimes = allData[d.id][0][yearSelected].length;
-            }
+                var attackTimes;
 
-            // console.log(attackTimes);
-            return percentScale(attackTimes);
-          }
+                if( typeof allData[d.id][0][yearSelected] == "undefined"){
+                    attackTimes = 0;
+                }
+                else{
+                    attackTimes = allData[d.id][0][yearSelected].length;
+                }
+
+                // console.log(attackTimes);
+                return percentScale(attackTimes);
+            }
 
         })
         .attr("d", path);
@@ -304,7 +334,6 @@
             + "<br> Target: " + d.targtype1_txt
             + "<br> # Killed: " + d.nkill + " # Wounded: " + d.nwound
             + "<br> Short Summary: " + d.summary;
-            // summary 太长了 想想有没有办法限制宽度
         });
 
 
@@ -338,14 +367,17 @@
         var total_ncase = 0;
         var total_nkill = 0;
         var total_nwound = 0;
+
         var total_attacktype1 = 0;
         var total_attacktype2 = 0;
         var total_attacktype3 = 0;
         var total_attacktype4 = 0;
+
         var total_targettype1 = 0;
         var total_targettype2 = 0;
         var total_targettype3 = 0;
         var total_targettype4 = 0;
+
         var total_weaptype1 = 0;
         var total_weaptype2 = 0;
         var total_weaptype3 = 0;
@@ -379,14 +411,16 @@
 
         // draw donut chart
         var dataset = [
-          { label: 'Abulia', count: total_nwound },
-          { label: 'Betelgeuse', count: total_nkill },
+          { label: '#wound', count: total_nwound },
+          { label: '#kill', count: total_nkill },
         ];
 
         var width = 150;
         var height = 150;
         var radius = Math.min(width, height) / 2;
         var donutWidth = 30;
+        var legendRectSize = 18;
+        var legendSpacing = 4;
 
         var color = d3.scaleOrdinal(d3.schemeCategory20b);
         var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
@@ -395,6 +429,7 @@
         for (i = 0; i < 3; i++) {
             var a = 100 + 200 * i;
             var b = 500 ;
+
             var svgChart = d3.select("#summary")
                 .append('svg')
                 .attr('width', 600)
@@ -408,7 +443,32 @@
                 .append('path')
                 .attr('d', arc)
                 .attr('fill', function(d, i) { return color(d.data.label); });
-        }
+
+            var legend = svgChart.selectAll('.legend')
+                .data(color.domain())
+                .enter()
+                .append('g')
+                .attr('class', 'legend')
+                .attr('transform', function(d, i) {
+                    var height = legendRectSize + legendSpacing;
+                    var offset =  height * color.domain().length / 2;
+                    var horz = - 2 * legendRectSize;
+                    var vert = i * height - offset;
+                    return 'translate(' + horz + ',' + vert + ')';
+                });
+
+            legend.append('rect')
+                .attr('width', legendRectSize)
+                .attr('height', legendRectSize)
+                .style('fill', color)
+                .style('stroke', color);
+
+            legend.append('text')
+                .attr('x', legendRectSize + legendSpacing)
+                .attr('y', legendRectSize - legendSpacing)
+                .text(function(d) { return d; });
+
+            };
     }
 
 
@@ -430,8 +490,11 @@
             q1 = versor.multiply(q0, versor.delta(v0, v1)),
             r1 = versor.rotation(q1);
         projection.rotate(r1);
+
         showGlobe();
+
         highlightCountry();
+
         if (focusedCountry) {showLocation();}
     };
 
@@ -472,32 +535,23 @@
         var tempData=[]
 
         terrorism.forEach(function(d){
-          var value = d;
-          countryKey[d.Country_ID].push(value);
+            var value = d;
+            countryKey[d.Country_ID].push(value);
         })
 
         var yearData = [];
 
         countryKey.forEach(function(d,i){
-          yearData = [];
-          for(var j=0;j<d.length;j++){
-            yearData[d[j].iyear]=[];
-          }
-          d.forEach(function(v){
-            var value = v;
-            yearData[v.iyear].push(value);
-          })
-          allData[i].push(yearData);
+            yearData = [];
+            for(var j=0;j<d.length;j++){
+                yearData[d[j].iyear]=[];
+            }
+            d.forEach(function(v){
+                var value = v;
+                yearData[v.iyear].push(value);
+            })
+            allData[i].push(yearData);
         })
-
-        // console.log(countryKey.length)
-        // console.log(allData)
-
-        // var nestedTerrorism = d3.nest()
-        // .key(function(d){ return d.Country_ID; })
-        // .key(function(d){ return d.iyear; })
-        // .rollup(function(v){ return v;})
-        // .entries(terrorism)
 
         // call render function to draw globe
         showGlobe();
