@@ -261,7 +261,7 @@
         .enter().append("path")
         .attr("class", "front")
         .style("fill", function(d){
-          if(typeof allData[d.id] == "undefined"){ return "green";}
+          if(typeof allData[d.id] == "undefined"){ return "green";}  //color for undefined id
           else{
             var attackTimes;
             if(typeof allData[d.id][0][yearSelected] == "undefined"){
@@ -271,7 +271,7 @@
               attackTimes = allData[d.id][0][yearSelected].length;
             }
 
-            console.log(attackTimes);
+            // console.log(attackTimes);
             return percentScale(attackTimes);
           }
 
@@ -321,7 +321,7 @@
                 .enter().append("circle")
                 .attr("cx", function(d) {return projection([d.longitude, d.latitude])[0];})
                 .attr("cy", function(d) {return projection([d.longitude, d.latitude])[1];})
-                .attr("r", 3)
+                .attr("r", 5)
                 .style("fill", "red")
                 .on("mouseover", tool_tip.show)
                 .on("mouseout", tool_tip.hide);
@@ -333,8 +333,8 @@
     function showSummary() {
         // console.log(allData[focusedCountry.id][0][yearSelected])
         svg2.selectAll("text").remove();
+        // d3.select("#chart1").remove();
 
-        var total_ncase = 0;
         var total_nkill = 0;
         var total_nwound = 0;
         var total_attacktype1 = 0;
@@ -354,60 +354,61 @@
             if (allData[focusedCountry.id][0][yearSelected]) {
                 allData[focusedCountry.id][0][yearSelected].forEach(function(d){
                     // console.log(Number(d.nkill))
-                    total_ncase += 1;
                     total_nkill += Number(d.nkill);
                     total_nwound += Number(d.nwound);
                 });
             };
         };
         // console.log(total_nkill)
-        svg2.append("text")
-        .text("Total Number of Case:" + total_ncase)
-        .attr("x", 50)
-        .attr("y", 100);
 
         svg2.append("text")
         .text("Total Number of killed:" + total_nkill)
-        .attr("x", 50)
-        .attr("y", 150);
+        .attr("x", 0)
+        .attr("y", 100);
 
         svg2.append("text")
         .text("Total Number of Wounded: " + total_nwound)
-        .attr("x", 50)
+        .attr("x", 0)
         .attr("y", 200);
 
         // draw donut chart
         var dataset = [
-          { label: 'nwound', count: total_nwound },
-          { label: 'nkill', count: total_nkill },
+          { label: 'Abulia', count: total_nwound },
+          { label: 'Betelgeuse', count: total_nkill },
+          { label: 'Cantaloupe', count: 30 },
+          { label: 'Dijkstra', count: 40 }
         ];
 
-        var width = 150;
-        var height = 150;
+        var width = 200;
+        var height = 200;
         var radius = Math.min(width, height) / 2;
-        var donutWidth = 30;
 
         var color = d3.scaleOrdinal(d3.schemeCategory20b);
-        var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
-        var pie = d3.pie().value(function(d) { return d.count; }).sort(null);
 
-        for (i = 0; i < 3; i++) {
-            var a = 100 + 200 * i;
-            var b = 500 ;
-            var svgChart = d3.select("#summary")
-                .append('svg')
-                .attr('width', 600)
-                .attr('height', 800)
-                .append('g')
-                .attr('transform', 'translate(' + a  +  ',' + b + ')');
+        var svgChart1 = d3.select("#summary")
+        .attr("id", "chart1")
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
 
-            var path = svgChart.selectAll('path')
-                .data(pie(dataset))
-                .enter()
-                .append('path')
-                .attr('d', arc)
-                .attr('fill', function(d, i) { return color(d.data.label); });
-        }
+        var arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+        var pie = d3.pie()
+        .value(function(d) { return d.count; })
+        .sort(null);
+
+        var path = svgChart1.selectAll('path')
+        .data(pie(dataset))
+        .enter()
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', function(d, i) {
+            return color(d.data.label);
+        });
     }
 
 
@@ -471,22 +472,22 @@
         var tempData=[]
 
         terrorism.forEach(function(d){
-            var value = d;
-            countryKey[d.Country_ID].push(value);
+          var value = d;
+          countryKey[d.Country_ID].push(value);
         })
 
         var yearData = [];
 
         countryKey.forEach(function(d,i){
-            yearData = [];
-            for(var j=0;j<d.length;j++){
-                yearData[d[j].iyear]=[];
-            }
-            d.forEach(function(v){
-                var value = v;
-                yearData[v.iyear].push(value);
-            })
-            allData[i].push(yearData);
+          yearData = [];
+          for(var j=0;j<d.length;j++){
+            yearData[d[j].iyear]=[];
+          }
+          d.forEach(function(v){
+            var value = v;
+            yearData[v.iyear].push(value);
+          })
+          allData[i].push(yearData);
         })
 
         // console.log(countryKey.length)
@@ -498,7 +499,7 @@
         // .rollup(function(v){ return v;})
         // .entries(terrorism)
 
-        // call showGlobe function to draw globe
+        // call render function to draw globe
         showGlobe();
     });
 </script>
