@@ -126,7 +126,7 @@
         stroke-width: 1px;
     }
     .front {
-        fill: pink;
+        /*fill: pink;*/
         stroke: red;
         stroke-width: 1px;
     }
@@ -201,6 +201,7 @@
 
         yearSelected = this.value;
         d3.select("#year-value").text(yearSelected);
+        showGlobe();
 
         if (allData[focusedCountry.id]) {
             showLocation();
@@ -216,7 +217,7 @@
     .attr("width", width)
     .attr("height", height);
     var svg2 = d3.select("body").append("svg").attr("id", "summary")
-    .attr("width", 600)
+    .attr("width", 500)
     .attr("height", height);
 
 
@@ -229,6 +230,10 @@
     var graticule = d3.geoGraticule();
     var grid = graticule();
     var circles;
+
+    var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
+    var percentScale = d3.scaleLinear()
+    .domain([0, 10, 100, 1000, 2000]).range(sequentialColors);
 
     function showGlobe() {
         svg.selectAll("path").remove();
@@ -255,6 +260,22 @@
         .data(countries)
         .enter().append("path")
         .attr("class", "front")
+        .style("fill", function(d){
+          if(typeof allData[d.id] == "undefined"){ return "green";}
+          else{
+            var attackTimes;
+            if(typeof allData[d.id][0][yearSelected] == "undefined"){
+              attackTimes = 0;
+            }
+            else{
+              attackTimes = allData[d.id][0][yearSelected].length;
+            }
+
+            console.log(attackTimes);
+            return percentScale(attackTimes);
+          }
+
+        })
         .attr("d", path);
 
         var gridFront = svg.selectAll("path.gridfront")
