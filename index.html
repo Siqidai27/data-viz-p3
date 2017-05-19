@@ -395,25 +395,31 @@
         };
         // console.log(total_nkill)
         svg2.append("text")
-        .text("Total Number of killed:" + total_ncase)
+        .text("Total Number of Terrorisms This Year: " + total_ncase)
         .attr("x", 50)
         .attr("y", 100);
 
         svg2.append("text")
-        .text("Total Number of killed:" + total_nkill)
+        .text("Total Number of People Killed This Year: " + total_nkill)
         .attr("x", 50)
         .attr("y", 150);
 
         svg2.append("text")
-        .text("Total Number of Wounded: " + total_nwound)
+        .text("Total Number of People Wounded This Year: " + total_nwound)
         .attr("x", 50)
         .attr("y", 200);
 
         // draw donut chart
-        var dataset = [
-          { label: '#wound', count: total_nwound },
-          { label: '#kill', count: total_nkill },
-        ];
+        var dataset = [[
+            { label: 'attacktype1_txt', count: total_nwound },
+            { label: 'attacktype2_txt', count: total_nkill },
+        ],[
+            { label: 'targettype1_txt', count: total_nwound },
+            { label: 'targettype2_txt', count: total_nkill },
+        ],[
+            { label: 'weapontype1_txt', count: total_nwound },
+            { label: 'weapontype2_txt', count: total_nkill },
+        ]];
 
         var width = 150;
         var height = 150;
@@ -422,53 +428,102 @@
         var legendRectSize = 18;
         var legendSpacing = 4;
 
-        var color = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color1 = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color2 = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color3 = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color = [color1, color2, color3];
+        
         var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
         var pie = d3.pie().value(function(d) { return d.count; }).sort(null);
 
-        for (i = 0; i < 3; i++) {
-            var a = 100 + 200 * i;
-            var b = 500 ;
-
+        dataset.forEach(function(d,i){
+            var j = i;
             var svgChart = d3.select("#summary")
                 .append('svg')
                 .attr('width', 600)
                 .attr('height', 800)
                 .append('g')
-                .attr('transform', 'translate(' + a  +  ',' + b + ')');
+                .attr('transform', function(){
+                    var a = 100 + 200 * i;
+                    var b = 500 ;
+                    return 'translate(' + a  +  ',' + b + ')';
+                });
 
             var path = svgChart.selectAll('path')
-                .data(pie(dataset))
+                .data(pie(dataset[i]))
                 .enter()
                 .append('path')
                 .attr('d', arc)
-                .attr('fill', function(d, i) { return color(d.data.label); });
+                .attr('fill', function(d, i) { return color[j](d.data.label); });
+
 
             var legend = svgChart.selectAll('.legend')
-                .data(color.domain())
+                .data(color[j].domain())
                 .enter()
                 .append('g')
                 .attr('class', 'legend')
                 .attr('transform', function(d, i) {
                     var height = legendRectSize + legendSpacing;
-                    var offset =  height * color.domain().length / 2;
+                    var offset =  height * color[j].domain().length / 2;
                     var horz = - 2 * legendRectSize;
-                    var vert = i * height - offset;
+                    var vert = i * height - offset + 200;
                     return 'translate(' + horz + ',' + vert + ')';
                 });
 
             legend.append('rect')
                 .attr('width', legendRectSize)
                 .attr('height', legendRectSize)
-                .style('fill', color)
-                .style('stroke', color);
+                .style('fill', color[i])
+                .style('stroke', color[i]);
 
             legend.append('text')
                 .attr('x', legendRectSize + legendSpacing)
                 .attr('y', legendRectSize - legendSpacing)
                 .text(function(d) { return d; });
-
-            };
+        })
+        // for (i = 0; i < 3; i++) {
+            // var a = 100 + 200 * i;
+            // var b = 500 ;
+            //
+            // var svgChart = d3.select("#summary")
+            //     .append('svg')
+            //     .attr('width', 600)
+            //     .attr('height', 800)
+            //     .append('g')
+            //     .attr('transform', 'translate(' + a  +  ',' + b + ')');
+            //
+            // var path = svgChart.selectAll('path')
+            //     .data(pie(dataset[i]))
+            //     .enter()
+            //     .append('path')
+            //     .attr('d', arc)
+            //     .attr('fill', function(d, i) { return color(d.data.label); });
+            //
+            // var legend = svgChart.selectAll('.legend')
+            //     .data(color.domain())
+            //     .enter()
+            //     .append('g')
+            //     .attr('class', 'legend')
+            //     .attr('transform', function(d, i) {
+            //         var height = legendRectSize + legendSpacing;
+            //         var offset =  height * color.domain().length / 2;
+            //         var horz = - 2 * legendRectSize;
+            //         var vert = i * height - offset;
+            //         return 'translate(' + horz + ',' + vert + ')';
+            //     });
+            //
+            // legend.append('rect')
+            //     .attr('width', legendRectSize)
+            //     .attr('height', legendRectSize)
+            //     .style('fill', color)
+            //     .style('stroke', color);
+            //
+            // legend.append('text')
+            //     .attr('x', legendRectSize + legendSpacing)
+            //     .attr('y', legendRectSize - legendSpacing)
+            //     .text(function(d) { return d; });
+            //
+            // };
     }
 
 
