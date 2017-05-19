@@ -227,7 +227,7 @@
 
 
 // create svg for globe
-    var width = 780, height = 800;
+    var width = 650, height = 680;
     var focused,
     countries,
     terrorismData=[],
@@ -241,13 +241,13 @@
 
     var svg2 = d3.select("body")
     .append("svg").attr("id", "summary")
-    .attr("width", 650)
+    .attr("width", 550)
     .attr("height", height);
 
 
 // !!!DRAW GLOBE!!!
     var projection = d3.geoOrthographic()
-    .scale(350)
+    .scale(300)
     .rotate([0, 0])
     .translate([width / 2 , height / 2 + 30]);
 
@@ -271,7 +271,7 @@
 		return array;
 	};
 
-    var percentScale = d3.scaleLinear()
+    var colorScale = d3.scaleLinear()
     .domain([0, 10, 50, 100, 200, 500, 1000, 1500]).range(sequentialColors(5,8));
 
     function showGlobe() {
@@ -316,7 +316,7 @@
                 }
 
                 // console.log(attackTimes);
-                return percentScale(attackTimes);
+                return colorScale(attackTimes);
             }
         })
         .attr("d", path);
@@ -410,33 +410,33 @@
         // console.log(total_nkill)
         svg2.append("text")
         .text("# of Terrorisms: " + total_ncase)
-        .attr("x", 50)
-        .attr("y", 100);
+        .attr("x", 0)
+        .attr("y", 80);
 
         svg2.append("text")
         .text("# of People Killed: " + total_nkill)
-        .attr("x", 50)
-        .attr("y", 125);
+        .attr("x", 0)
+        .attr("y", 100);
 
         svg2.append("text")
         .text("# of People Wounded: " + total_nwound)
-        .attr("x", 50)
-        .attr("y", 150);
+        .attr("x", 0)
+        .attr("y", 120);
 
         svg2.append("text")
         .text("Attack Type")
-        .attr("x", 55)
-        .attr("y", 200);
+        .attr("x", 35)
+        .attr("y", 160);
 
         svg2.append("text")
         .text("Target Type")
-        .attr("x", 255)
-        .attr("y", 200);
+        .attr("x", 195)
+        .attr("y", 160);
 
         svg2.append("text")
         .text("Weapon Type")
-        .attr("x", 455)
-        .attr("y", 200);
+        .attr("x", 355)
+        .attr("y", 160);
 
         // draw donut chart
         var dataset = [[
@@ -488,10 +488,10 @@
         	{label:'Unknown', count:total_weaptype_count[12]}
         ]];
 
-        var width = 150;
-        var height = 150;
+        var width = 120;
+        var height = 120;
         var radius = Math.min(width, height) / 2;
-        var donutWidth = 30;
+        var donutWidth = 25;
         var legendRectSize = 12;
         var legendSpacing = 4;
 
@@ -511,8 +511,8 @@
                 .attr('height', 800)
                 .append('g')
                 .attr('transform', function(){
-                    var a = 100 + 200 * j;
-                    var b = 300 ;
+                    var a = 80 + 160 * j;
+                    var b = 240 ;
                     return 'translate(' + a  +  ',' + b + ')';
                 });
 
@@ -532,7 +532,7 @@
                     var height = legendRectSize + legendSpacing;
                     var offset =  height * color[j].domain().length / 2;
                     var horz = - 2 * legendRectSize;
-                    var vert = i * height - offset + 300;
+                    var vert = i * height - offset + 250;
                     return 'translate(' + horz + ',' + vert + ')';
                 });
 
