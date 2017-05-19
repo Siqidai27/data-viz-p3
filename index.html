@@ -413,12 +413,18 @@
         var dataset = [[
             { label: 'attacktype1_txt', count: total_nwound },
             { label: 'attacktype2_txt', count: total_nkill },
+            { label: 'attacktype3_txt', count: total_nwound },
+            { label: 'attacktype4_txt', count: total_nkill },
         ],[
             { label: 'targettype1_txt', count: total_nwound },
             { label: 'targettype2_txt', count: total_nkill },
+            { label: 'targettype3_txt', count: total_nwound },
+            { label: 'targettype4_txt', count: total_nkill },
         ],[
             { label: 'weapontype1_txt', count: total_nwound },
             { label: 'weapontype2_txt', count: total_nkill },
+            { label: 'weapontype3_txt', count: total_nwound },
+            { label: 'weapontype4_txt', count: total_nkill },
         ]];
 
         var width = 150;
@@ -428,9 +434,9 @@
         var legendRectSize = 18;
         var legendSpacing = 4;
 
-        var color1 = d3.scaleOrdinal(d3.schemeCategory20b);
-        var color2 = d3.scaleOrdinal(d3.schemeCategory20b);
-        var color3 = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color1 = d3.scaleOrdinal(d3.schemeCategory10);
+        var color2 = d3.scaleOrdinal(d3.schemeCategory10);
+        var color3 = d3.scaleOrdinal(d3.schemeCategory10);
         var color = [color1, color2, color3];
 
         var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
