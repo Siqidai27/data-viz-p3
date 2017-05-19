@@ -15,10 +15,10 @@
     <script src="scripts/d3.slider.js"></script>
 </head>
 <style>
-    div, svg {
+    /*div, svg {
         border: 1px solid silver;
-        margin: 10px;
-    }
+        /*margin: 10px;*/
+    }*/
     rect {
         fill: skyblue;
         stroke-width: 2;
@@ -91,7 +91,7 @@
 
     #selectYear {
          position: absolute;
-         left: 50px;
+         left: 60px;
          top: 0px;
          font-family: "arial"
     }
@@ -131,7 +131,7 @@
     }
     .front {
         /*fill: pink;*/
-        stroke: red;
+        stroke: grey;
         stroke-width: 1px;
     }
     .gridfront {
@@ -155,7 +155,7 @@
             style="display: inline-block; text-align: left; width: 200px; height: 0px; color: black;">
             year: <span id="year-value"></span>
         </label>
-        <input id="year" type="range" min="1970" max="2015" step="1" value="2015">
+        <input id="year" type="range" min="1990" max="2015" step="1" value="2015">
     </div>
     <!-- <div class="container"></div> -->
 <script>
@@ -227,7 +227,7 @@
 
 
 // create svg for globe
-    var width = 800, height = 800;
+    var width = 780, height = 800;
     var focused,
     countries,
     terrorismData=[],
@@ -241,7 +241,7 @@
 
     var svg2 = d3.select("body")
     .append("svg").attr("id", "summary")
-    .attr("width", 600)
+    .attr("width", 650)
     .attr("height", height);
 
 
@@ -259,10 +259,20 @@
 
     var circles;
 
-    var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
+    // var sequentialColors = ['#edf8fb','#b2e2e2','#66c2a4','#2ca25f','#006d2c'];
+    // var sequentialColors = d3.scaleSequential(d3.schemeOrRd);
+    var sequentialColors = function arrayColors(hue, n) {
+		var hue;
+		var array = [];
+		for (var i = 0; i < n; i++) {
+			var object = d3.hsl(hue, 0.8, 0.8 - 0.08 * i);
+			array.push(object);
+		}
+		return array;
+	};
 
     var percentScale = d3.scaleLinear()
-    .domain([0, 10, 100, 1000, 2000]).range(sequentialColors);
+    .domain([0, 5, 10, 50, 100, 500, 1000, 1500]).range(sequentialColors(5,8));
 
     function showGlobe() {
         svg.selectAll("path").remove();
@@ -290,11 +300,17 @@
         .enter().append("path")
         .attr("class", "front")
         .style("fill", function(d){
-            if( typeof allData[d.id] == "undefined"){ return "green";}  //color for undefined id
+            // console.log(focusedCountry)
+            if (focusedCountry) {
+                if (d.id == focusedCountry.id) {return "#87BCDE"}
+            }
+            if( typeof allData[d.id] == "undefined" ){
+                return "green";
+            }  //color for undefined id
             else{
                 var attackTimes;
 
-                if( typeof allData[d.id][0][yearSelected] == "undefined"){
+                if ( typeof allData[d.id][0][yearSelected] == "undefined" ){
                     attackTimes = 0;
                 }
                 else{
@@ -304,7 +320,6 @@
                 // console.log(attackTimes);
                 return percentScale(attackTimes);
             }
-
         })
         .attr("d", path);
 
@@ -319,14 +334,16 @@
 // highlight focusedCountry
     function highlightCountry() {
         svg.selectAll("path").classed("focused", function(d, i) {
-            if (focusedCountry) { return d.id == focusedCountry.id ? focused = d : false; }
+            if (focusedCountry) {
+                return d.id == focusedCountry.id ? focused = d : false;
+            }
         });
     };
 
     var tool_tip = d3.tip()
         .attr("class", "d3-tip")
         .offset([-15, -10])
-        .html(function(d,i) {
+        .html( function(d,i) {
         // console.log(d)
             return "Date: " + d.iyear + "-" + d.imonth + "-" + d.iday
             + "<br> Location: " + d.city + ", " + d.provstate + ", " +d.country_txt
@@ -358,6 +375,7 @@
         };
     };
 
+
 // !!!SHOW SUMMARY!!!
     function showSummary() {
         // console.log(allData[focusedCountry.id][0][yearSelected])
@@ -368,76 +386,10 @@
         var total_nkill = 0;
         var total_nwound = 0;
 
-
-        var total_attacktype1 = 0;
-        var total_attacktype2 = 0;
-        var total_attacktype3 = 0;
-        var total_attacktype4 = 0;
-
-        var total_targettype1 = 0;
-        var total_targettype2 = 0;
-        var total_targettype3 = 0;
-        var total_targettype4 = 0;
-
-        var total_weaptype1 = 0;
-        var total_weaptype2 = 0;
-        var total_weaptype3 = 0;
-        var total_weaptype4 = 0;
-=======
-
-
-
         //get the attacktype, targettype and weaptype for yearSelected
-        // var total_attacktype1 = 0;
-        // var total_attacktype2 = 0;
-        // var total_attacktype3 = 0;
-        // var total_attacktype4 = 0;
-        // var total_attacktype5 = 0;
-        // var total_attacktype6 = 0;
-        // var total_attacktype7 = 0;
-        // var total_attacktype8 = 0;
-        // var total_attacktype9 = 0;
-
-        // var total_targettype1 = 0;
-        // var total_targettype2 = 0;
-        // var total_targettype3 = 0;
-        // var total_targettype4 = 0;
-        // var total_targettype5 = 0;
-        // var total_targettype6 = 0;
-        // var total_targettype7 = 0;
-        // var total_targettype8 = 0;
-        // var total_targettype9 = 0;
-        // var total_targettype10 = 0;
-        // var total_targettype11 = 0;
-        // var total_targettype12 = 0;
-        // var total_targettype13 = 0;
-        // var total_targettype14 = 0;
-        // var total_targettype15 = 0;
-        // var total_targettype16 = 0;
-        // var total_targettype17 = 0;
-        // var total_targettype18 = 0;
-        // var total_targettype19 = 0;
-        // var total_targettype20 = 0;
-        // var total_targettype21 = 0;
-        // var total_targettype22 = 0;
-
-        // var total_weaptype1 = 0;
-        // var total_weaptype2 = 0;
-        // var total_weaptype3 = 0;
-        // var total_weaptype4 = 0;
-        // var total_weaptype5 = 0;
-        // var total_weaptype6 = 0;
-        // var total_weaptype7 = 0;
-        // var total_weaptype8 = 0;
-        // var total_weaptype9 = 0;
-        // var total_weaptype10 = 0;
-        // var total_weaptype11 = 0;
-        // var total_weaptype12 = 0;
-        // var total_weaptype13 = 0;
         var total_attacktype_count = [0,0,0,0,0,0,0,0,0]
         var total_targettype_count = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         var total_weaptype_count = [0,0,0,0,0,0,0,0,0,0,0,0,0]
-
 
         if (allData[focusedCountry.id]) {
             if (allData[focusedCountry.id][0][yearSelected]) {
@@ -455,28 +407,41 @@
 
                 });
             };
-        };
+        }
+
         // console.log(total_nkill)
         svg2.append("text")
-        .text("Total Number of Terrorisms This Year: " + total_ncase)
+        .text("# of Terrorisms: " + total_ncase)
         .attr("x", 50)
         .attr("y", 100);
 
         svg2.append("text")
-        .text("Total Number of People Killed This Year: " + total_nkill)
+        .text("# of People Killed: " + total_nkill)
+        .attr("x", 50)
+        .attr("y", 125);
+
+        svg2.append("text")
+        .text("# of People Wounded: " + total_nwound)
         .attr("x", 50)
         .attr("y", 150);
 
         svg2.append("text")
-        .text("Total Number of People Wounded This Year: " + total_nwound)
-        .attr("x", 50)
+        .text("Attack Type")
+        .attr("x", 55)
+        .attr("y", 200);
+
+        svg2.append("text")
+        .text("Target Type")
+        .attr("x", 255)
+        .attr("y", 200);
+
+        svg2.append("text")
+        .text("Weapon Type")
+        .attr("x", 455)
         .attr("y", 200);
 
         // draw donut chart
         var dataset = [[
-        	{ label: 'Abulia', count: total_nwound },
-          	{ label: 'Betelgeuse', count: total_nkill }
-        ],[
           	{label:'Assassination', count:total_attacktype_count[0]},
           	{label:'Armed Assault', count:total_attacktype_count[1]},
           	{label:'Bombing/Explosion', count:total_attacktype_count[2]},
@@ -523,14 +488,13 @@
         	{label:'Sabotage Equipment', count:total_weaptype_count[10]},
         	{label:'Other', count:total_weaptype_count[11]},
         	{label:'Unknown', count:total_weaptype_count[12]}
-
         ]];
 
         var width = 150;
         var height = 150;
         var radius = Math.min(width, height) / 2;
         var donutWidth = 30;
-        var legendRectSize = 18;
+        var legendRectSize = 12;
         var legendSpacing = 4;
 
         var color1 = d3.scaleOrdinal(d3.schemeCategory10);
@@ -545,12 +509,12 @@
             var j = i;
             var svgChart = d3.select("#summary")
                 .append('svg')
-                .attr('width', 600)
+                .attr('width', 650)
                 .attr('height', 800)
                 .append('g')
                 .attr('transform', function(){
                     var a = 100 + 200 * j;
-                    var b = 500 ;
+                    var b = 300 ;
                     return 'translate(' + a  +  ',' + b + ')';
                 });
 
@@ -561,7 +525,6 @@
                 .attr('d', arc)
                 .attr('fill', function(d, i) { return color[j](d.data.label); });
 
-
             var legend = svgChart.selectAll('.legend')
                 .data(color[j].domain())
                 .enter()
@@ -571,7 +534,7 @@
                     var height = legendRectSize + legendSpacing;
                     var offset =  height * color[j].domain().length / 2;
                     var horz = - 2 * legendRectSize;
-                    var vert = i * height - offset + 200;
+                    var vert = i * height - offset + 300;
                     return 'translate(' + horz + ',' + vert + ')';
                 });
 
