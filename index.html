@@ -461,15 +461,15 @@
         	{label:'Food or Water Supply', count: total_targettype_count[8]},
         	{label:'Journalists & Media', count: total_targettype_count[9]},
         	{label:'Maritime', count: total_targettype_count[10]},
-        	{label:'NGO', count: total_targettype_count[11]},
-        	{label:'Other', count: total_targettype_count[12]},
+        	// {label:'NGO', count: total_targettype_count[11]},
+        	// {label:'Other', count: total_targettype_count[12]},
         	{label:'Private Citizens & Property', count: total_targettype_count[13]},
         	{label:'Religious Figures/Institutions', count: total_targettype_count[14]},
         	{label:'Telecommunication', count: total_targettype_count[15]},
         	{label:'Terrorists/Non-State Militia', count: total_targettype_count[16]},
         	{label:'Tourists', count: total_targettype_count[17]},
         	{label:'Transportation', count: total_targettype_count[18]},
-        	{label:'Unknown', count: total_targettype_count[19]},
+        	{label:'Unknown', count: total_targettype_count[12] + total_targettype_count[19]},
         	{label:'Utilities', count: total_targettype_count[20]},
         	{label:'Violent Political Party', count: total_targettype_count[21]}
         ],[
@@ -495,9 +495,9 @@
         var legendRectSize = 12;
         var legendSpacing = 4;
 
-        var color1 = d3.scaleOrdinal(d3.schemeCategory10);
-        var color2 = d3.scaleOrdinal(d3.schemeCategory10);
-        var color3 = d3.scaleOrdinal(d3.schemeCategory10);
+        var color1 = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color2 = d3.scaleOrdinal(d3.schemeCategory20b);
+        var color3 = d3.scaleOrdinal(d3.schemeCategory20b);
         var color = [color1, color2, color3];
 
         var arc = d3.arc().innerRadius(radius - donutWidth).outerRadius(radius);
