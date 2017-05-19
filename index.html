@@ -272,7 +272,7 @@
 	};
 
     var percentScale = d3.scaleLinear()
-    .domain([0, 5, 10, 50, 100, 500, 1000, 1500]).range(sequentialColors(5,8));
+    .domain([0, 10, 50, 100, 200, 500, 1000, 1500]).range(sequentialColors(5,8));
 
     function showGlobe() {
         svg.selectAll("path").remove();
@@ -302,11 +302,9 @@
         .style("fill", function(d){
             // console.log(focusedCountry)
             if (focusedCountry) {
-                if (d.id == focusedCountry.id) {return "#87BCDE"}
+                if (d.id == focusedCountry.id) {return "#87BCDE"; }
             }
-            if( typeof allData[d.id] == "undefined" ){
-                return "green";
-            }  //color for undefined id
+            if( typeof allData[d.id] == "undefined" ){ return "green"; }  //color for undefined id
             else{
                 var attackTimes;
 
