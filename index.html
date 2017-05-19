@@ -367,7 +367,7 @@
         var total_ncase = 0;
         var total_nkill = 0;
         var total_nwound = 0;
-<<<<<<< Updated upstream
+
 
         var total_attacktype1 = 0;
         var total_attacktype2 = 0;
@@ -384,7 +384,7 @@
         var total_weaptype3 = 0;
         var total_weaptype4 = 0;
 =======
-   
+
 
 
         //get the attacktype, targettype and weaptype for yearSelected
@@ -438,7 +438,6 @@
         var total_targettype_count = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         var total_weaptype_count = [0,0,0,0,0,0,0,0,0,0,0,0,0]
 
->>>>>>> Stashed changes
 
         if (allData[focusedCountry.id]) {
             if (allData[focusedCountry.id][0][yearSelected]) {
@@ -475,22 +474,6 @@
 
         // draw donut chart
         var dataset = [[
-// <<<<<<< Updated upstream
-//             { label: 'attacktype1_txt', count: total_nwound },
-//             { label: 'attacktype2_txt', count: total_nkill },
-//             { label: 'attacktype3_txt', count: total_nwound },
-//             { label: 'attacktype4_txt', count: total_nkill },
-//         ],[
-//             { label: 'targettype1_txt', count: total_nwound },
-//             { label: 'targettype2_txt', count: total_nkill },
-//             { label: 'targettype3_txt', count: total_nwound },
-//             { label: 'targettype4_txt', count: total_nkill },
-//         ],[
-//             { label: 'weapontype1_txt', count: total_nwound },
-//             { label: 'weapontype2_txt', count: total_nkill },
-//             { label: 'weapontype3_txt', count: total_nwound },
-//             { label: 'weapontype4_txt', count: total_nkill },
-=======
         	{ label: 'Abulia', count: total_nwound },
           	{ label: 'Betelgeuse', count: total_nkill }
         ],[
@@ -540,7 +523,7 @@
         	{label:'Sabotage Equipment', count:total_weaptype_count[10]},
         	{label:'Other', count:total_weaptype_count[11]},
         	{label:'Unknown', count:total_weaptype_count[12]}
->>>>>>> Stashed changes
+
         ]];
 
         var width = 150;
